@@ -1,28 +1,40 @@
-/* Original “neon on navy” theme + light 8-bit garnish (no game assets). */
+@font-face {
+  font-family: "Renogare";
+  src: url("../fonts/renogare/Renogare-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pixeloid Mono";
+  src: url("../fonts/PixeloidMono-nAOpP.ttf") format("truetype");
+  font-display: swap;
+}
+
 :root {
-  --bg-deep: #07080d;
-  --bg-raised: #0e1018;
-  --bg-card: #12151f;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --text: rgba(245, 246, 250, 0.92);
-  --text-muted: rgba(200, 204, 220, 0.72);
-  --text-faint: rgba(156, 163, 186, 0.55);
-  --accent: #7cf0d4;
-  --accent-dim: rgba(124, 240, 212, 0.16);
-  --accent-hot: #ff7bc5;
-  --accent-hot-dim: rgba(255, 123, 197, 0.12);
-  --danger: #f87171;
+  --bg-deep: #090a16;
+  --bg-raised: #111328;
+  --bg-card: #151936;
+  --border-subtle: rgba(156, 172, 255, 0.18);
+  --border-strong: rgba(179, 133, 255, 0.46);
+  --text: rgba(244, 247, 255, 0.94);
+  --text-muted: rgba(204, 214, 247, 0.78);
+  --text-faint: rgba(149, 160, 208, 0.68);
+  --accent-cyan: #62e9ff;
+  --accent-purple: #9a6bff;
+  --accent-pink: #ff68cc;
+  --accent-gold: #ffd26e;
+  --accent-cyan-dim: rgba(98, 233, 255, 0.2);
+  --accent-purple-dim: rgba(154, 107, 255, 0.22);
   --font-sans: "DM Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-pixel: "Press Start 2P", ui-monospace, monospace;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-pixel: 6px;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --font-display: "Renogare", "Press Start 2P", "Pixeloid Mono", ui-monospace,
+    monospace;
+  --font-pixel: "Pixeloid Mono", "Press Start 2P", ui-monospace, monospace;
+  --radius-pixel: 4px;
+  --shadow: 0 24px 52px rgba(0, 0, 0, 0.48);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --pixel: 4px;
+  --pixel: 3px;
 }
 
 *,
@@ -48,18 +60,29 @@ body {
   font-size: 1.0625rem;
   line-height: 1.65;
   color: var(--text);
-  background: var(--bg-deep);
+  background:
+    linear-gradient(180deg, #0e1130 0%, var(--bg-deep) 38%, #070812 100%),
+    var(--bg-deep);
   overflow-x: hidden;
 }
 
-/* Subtle CRT-style scanlines (8-bit vibe, stays out of the way). */
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.08;
+  background: url("../8bit/celeste/Gameplay/bgs/03/bg2.png") center / cover no-repeat;
+}
+
 body::after {
   content: "";
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 5;
-  opacity: 0.045;
+  opacity: 0;
   background: repeating-linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.22),
@@ -70,7 +93,7 @@ body::after {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-cyan);
   outline-offset: 3px;
 }
 
@@ -80,53 +103,80 @@ body::after {
   top: 0.75rem;
   z-index: 100;
   padding: 0.5rem 1rem;
-  background: var(--accent);
-  color: #041014;
+  background: var(--accent-gold);
+  color: #191203;
   font-weight: 600;
   font-family: var(--font-sans);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   box-shadow:
-    var(--pixel) 0 0 0 #041014,
-    0 var(--pixel) 0 0 #041014;
+    var(--pixel) 0 0 0 #191203,
+    0 var(--pixel) 0 0 #191203;
 }
 .skip-link:focus {
   left: 0.75rem;
 }
 
 /* --- Background layers --- */
-.bg-grid {
+.bg-stars {
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 0;
+  opacity: 0.62;
   image-rendering: pixelated;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent);
 }
 
-.bg-glow {
-  pointer-events: none;
-  position: fixed;
-  width: min(90vw, 520px);
-  height: min(90vw, 520px);
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.35;
-  z-index: 0;
+.bg-stars__layer {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: opacity 0.9s var(--ease-out);
 }
-.bg-glow--one {
-  top: -120px;
-  right: -80px;
-  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+
+.bg-stars__layer--a {
+  opacity: 1;
 }
-.bg-glow--two {
-  bottom: -160px;
-  left: -100px;
-  background: radial-gradient(circle, var(--accent-hot) 0%, transparent 72%);
+
+.bg-stars__layer--b {
+  opacity: 0;
+}
+
+.bg-stars.is-swapped .bg-stars__layer--a {
+  opacity: 0;
+}
+
+.bg-stars.is-swapped .bg-stars__layer--b {
+  opacity: 1;
+}
+
+.bg-stars__planet {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  image-rendering: pixelated;
   opacity: 0.22;
+  animation: planet-drift 14s ease-in-out infinite;
+}
+
+.bg-stars__planet--one {
+  top: 11%;
+  right: 9%;
+  width: clamp(48px, 8vw, 104px);
+  aspect-ratio: 1 / 1;
+  background-image: url("../8bit/celeste/Gameplay/bgs/10/Planets/small03.png");
+}
+
+.bg-stars__planet--two {
+  bottom: 14%;
+  left: 7%;
+  width: clamp(70px, 12vw, 140px);
+  aspect-ratio: 1 / 1;
+  background-image: url("../8bit/celeste/Gameplay/bgs/10/Planets/big01.png");
+  opacity: 0.15;
+  animation-delay: -5s;
 }
 
 /* --- Header --- */
@@ -140,25 +190,40 @@ body::after {
   gap: 1rem;
   padding: 1rem clamp(1.25rem, 4vw, 2.5rem);
   border-bottom: 2px solid var(--border-subtle);
-  background: color-mix(in srgb, var(--bg-deep) 82%, transparent);
+  background: color-mix(in srgb, var(--bg-deep) 84%, transparent);
   backdrop-filter: blur(12px);
-  box-shadow: inset 0 -2px 0 rgba(124, 240, 212, 0.08);
+  box-shadow: inset 0 -2px 0 rgba(98, 233, 255, 0.22);
 }
 
 .logo {
-  font-family: var(--font-pixel);
-  font-size: 0.72rem;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold);
+  text-transform: uppercase;
   text-decoration: none;
   text-shadow:
-    2px 0 0 color-mix(in srgb, var(--accent-hot) 55%, transparent),
-    0 2px 0 rgba(0, 0, 0, 0.45);
+    1px 0 0 var(--accent-purple),
+    2px 2px 0 rgba(0, 0, 0, 0.55);
   transition: color 0.25s var(--ease-out), transform 0.35s var(--ease-spring);
+  padding-left: 1.45rem;
+  position: relative;
+}
+.logo::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  background: url("../8bit/celeste/Icons/start.png") center / contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.9;
 }
 .logo:hover {
-  color: var(--accent);
+  color: var(--accent-cyan);
   transform: translateY(-1px);
 }
 
@@ -172,7 +237,7 @@ body::after {
   color: var(--text-muted);
   text-decoration: none;
   position: relative;
-  padding: 0.2rem 0;
+  padding: 0.22rem 0;
   transition: color 0.25s var(--ease-out);
 }
 .nav a::after {
@@ -182,7 +247,7 @@ body::after {
   bottom: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-hot));
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--ease-out);
@@ -199,7 +264,7 @@ main {
   position: relative;
   z-index: 1;
   padding: clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 4vw, 2.5rem) 4rem;
-  max-width: 900px;
+  max-width: 940px;
   margin: 0 auto;
 }
 
@@ -209,14 +274,14 @@ main {
 }
 
 .eyebrow {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-size: 0.58rem;
   line-height: 1.9;
-  color: var(--accent);
-  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin: 0 0 1rem;
-  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent-cyan) 45%, transparent);
 }
 
 .hero__title {
@@ -229,8 +294,14 @@ main {
 .hero__name {
   font-size: clamp(2.35rem, 5.5vw, 3.25rem);
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.01em;
   line-height: 1.1;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  color: var(--text);
+  text-shadow:
+    0 0 20px rgba(98, 233, 255, 0.2),
+    2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 .hero__tagline {
@@ -256,7 +327,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-pixel);
+  border-radius: 0;
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
@@ -268,27 +339,41 @@ main {
     background 0.25s var(--ease-out),
     border-color 0.25s var(--ease-out),
     color 0.25s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  margin-right: 0.55rem;
+  background: url("../8bit/celeste/Icons/a.png") center / contain no-repeat;
+  image-rendering: pixelated;
+  flex: none;
+}
+.btn--ghost::before {
+  background-image: url("../8bit/celeste/Icons/x.png");
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #5adfc4 100%);
-  color: #041014;
-  border-color: color-mix(in srgb, white 25%, var(--accent));
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, #98f4ff 100%);
+  color: #071017;
+  border-color: color-mix(in srgb, white 25%, var(--accent-cyan));
   box-shadow:
-    0 var(--pixel) 0 0 #062a24,
-    0 8px 28px rgba(124, 240, 212, 0.25);
+    0 var(--pixel) 0 0 #12334c,
+    0 8px 24px rgba(98, 233, 255, 0.25);
 }
 .btn--primary:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 calc(var(--pixel) + 2px) 0 0 #041814,
-    0 14px 36px rgba(124, 240, 212, 0.32);
+    0 calc(var(--pixel) + 2px) 0 0 #0b2330,
+    0 14px 32px rgba(98, 233, 255, 0.3);
 }
 .btn--primary:active {
   transform: translateY(1px);
   box-shadow:
-    0 2px 0 0 #062a24,
-    0 8px 24px rgba(124, 240, 212, 0.22);
+    0 2px 0 0 #12334c,
+    0 8px 24px rgba(98, 233, 255, 0.22);
 }
 
 .btn--ghost {
@@ -298,18 +383,30 @@ main {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 .btn--ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
   transform: translateY(-2px);
   box-shadow:
-    0 var(--pixel) 0 0 color-mix(in srgb, var(--accent) 35%, black),
-    0 0 0 1px var(--accent-dim);
+    0 var(--pixel) 0 0 color-mix(in srgb, var(--accent-purple) 35%, black),
+    0 0 0 1px var(--accent-purple-dim);
 }
 
 /* --- Sections --- */
 .section {
   padding: clamp(2.5rem, 5vw, 3.5rem) 0;
   border-top: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.section::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 1.4rem;
+  width: 82px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-purple));
+  opacity: 0.45;
 }
 
 .section__head {
@@ -319,7 +416,36 @@ main {
 .section__title {
   margin: 0 0 0.35rem;
   font-size: clamp(1.5rem, 3vw, 1.85rem);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section__title::before {
+  content: "";
+  width: 1.2em;
+  height: 1.2em;
+  background: url("../8bit/celeste/Gameplay/custom/normal05.png") center / contain
+    no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.98;
+}
+
+.section--work .section__title::before {
+  background-image: url("../8bit/celeste/Gameplay/custom/flyup00.png");
+}
+
+.section--interests .section__title::before {
+  background-image: url("../8bit/celeste/Gameplay/custom/ghost00.png");
+}
+
+.section--philosophy .section__title::before {
+  background-image: url("../8bit/celeste/Gameplay/custom/idle00.png");
 }
 
 .section__kicker {
@@ -327,6 +453,20 @@ main {
   color: var(--text-muted);
   font-size: 1rem;
   max-width: 50ch;
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.section__kicker::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.32rem;
+  width: 10px;
+  height: 10px;
+  background: url("../8bit/celeste/Icons/1x0.png") center / contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.9;
 }
 
 .section__body {
@@ -341,7 +481,7 @@ main {
   margin: 0 0 1rem;
 }
 .prose a {
-  color: var(--accent);
+  color: var(--accent-cyan);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
   transition: color 0.2s;
@@ -355,8 +495,8 @@ main {
   font-size: 0.88em;
   padding: 0.12em 0.35em;
   border-radius: 4px;
-  background: var(--accent-dim);
-  color: var(--accent);
+  background: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
 }
 
@@ -376,14 +516,10 @@ main {
   bottom: 0.35rem;
   width: 4px;
   image-rendering: pixelated;
-  background: linear-gradient(
-    180deg,
-    var(--accent),
-    color-mix(in srgb, var(--accent-hot) 70%, transparent)
-  );
+  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
   border-radius: 0;
   opacity: 0.55;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-cyan) 35%, transparent);
 }
 
 .timeline__item {
@@ -404,18 +540,29 @@ main {
   border-radius: 0;
   image-rendering: pixelated;
   background: var(--bg-deep);
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-cyan);
   box-shadow:
-    0 0 0 2px var(--accent-dim),
-    2px 2px 0 0 var(--accent-hot);
+    0 0 0 2px var(--accent-cyan-dim),
+    2px 2px 0 0 var(--accent-purple);
+  overflow: hidden;
+}
+.timeline__marker::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: url("../8bit/celeste/Gameplay/collectables/key/idle00.png") center /
+    contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.95;
 }
 
 .timeline__card {
   background: var(--bg-card);
   border: 2px solid var(--border-subtle);
-  border-radius: var(--radius-pixel);
+  border-radius: 0;
   padding: 1.25rem 1.35rem;
   box-shadow: var(--shadow);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
   transition:
     transform 0.45s var(--ease-out),
     border-color 0.35s var(--ease-out),
@@ -423,20 +570,34 @@ main {
 }
 .timeline__card:hover {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-subtle));
+  border-color: color-mix(in srgb, var(--accent-cyan) 35%, var(--border-subtle));
   box-shadow:
     var(--shadow),
-    0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent),
-    4px 4px 0 0 color-mix(in srgb, var(--accent-hot) 45%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--accent-cyan) 24%, transparent),
+    4px 4px 0 0 color-mix(in srgb, var(--accent-purple) 48%, transparent);
 }
 
 .timeline__meta {
   margin: 0 0 0.35rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-pixel);
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--accent-gold);
+  position: relative;
+  padding-left: 1rem;
+}
+
+.timeline__meta::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  width: 10px;
+  height: 10px;
+  background: url("../8bit/celeste/Icons/1x0.png") center / contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.88;
 }
 
 .timeline__heading {
@@ -460,26 +621,45 @@ main {
 .card {
   background: var(--bg-raised);
   border: 2px solid var(--border-subtle);
-  border-radius: var(--radius-pixel);
+  border-radius: 0;
   padding: 1.25rem 1.3rem;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
   transition:
     transform 0.45s var(--ease-out),
     border-color 0.35s var(--ease-out),
     background 0.35s var(--ease-out),
     box-shadow 0.45s var(--ease-out);
+  position: relative;
 }
 .card:hover {
   transform: translateY(-6px) scale(1.01);
-  border-color: color-mix(in srgb, var(--accent-hot) 45%, var(--border-subtle));
-  background: color-mix(in srgb, var(--bg-card) 88%, var(--accent-hot));
+  border-color: color-mix(in srgb, var(--accent-purple) 45%, var(--border-subtle));
+  background: color-mix(in srgb, var(--bg-card) 90%, var(--accent-purple));
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.35),
-    4px 4px 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+    4px 4px 0 0 color-mix(in srgb, var(--accent-cyan) 55%, transparent);
 }
 
 .card__title {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card__title::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  background: url("../8bit/celeste/Gameplay/objects/snowberry.png") center / contain
+    no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.95;
 }
 
 .card__text {
@@ -491,11 +671,11 @@ main {
 .philosophy {
   margin: 0;
   padding: 1.5rem 1.5rem 1.5rem 1.75rem;
-  border-left: 4px solid var(--accent);
-  border-radius: 0 var(--radius-pixel) var(--radius-pixel) 0;
+  border-left: 4px solid var(--accent-purple);
+  border-radius: 0;
   background: linear-gradient(
     90deg,
-    var(--accent-dim),
+    var(--accent-purple-dim),
     transparent 55%
   );
   font-size: 1.08rem;
@@ -520,7 +700,7 @@ main {
   font-size: 0.95rem;
 }
 .footer__text a {
-  color: var(--accent);
+  color: var(--accent-cyan);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -532,10 +712,74 @@ main {
   color: var(--text-faint);
 }
 
+@keyframes stars-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes planet-drift {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 .footer__note {
   margin: 0;
   font-size: 0.8rem;
   color: var(--text-faint);
+}
+
+.footer__celeste-note {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.footer__celeste-note::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: url("../8bit/celeste/Icons/logo.png") center / contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.88;
+}
+
+.site-signature {
+  position: fixed;
+  right: 0.9rem;
+  bottom: 0.75rem;
+  z-index: 60;
+  margin: 0;
+  padding: 0.34rem 0.65rem 0.34rem 2.2rem;
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--accent-gold);
+  background: color-mix(in srgb, var(--bg-card) 84%, transparent);
+  border: 1px solid var(--border-subtle);
+}
+
+.site-signature::before {
+  content: "";
+  position: absolute;
+  left: 0.34rem;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translateY(-50%);
+  background: url("../8bit/celeste/Icons/saveIcon00006.png") center / contain
+    no-repeat;
+  image-rendering: pixelated;
 }
 
 /* --- Scroll reveal --- */
@@ -552,6 +796,10 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body::before {
+    opacity: 0.09;
+  }
+
   body::after {
     opacity: 0.02;
   }
@@ -565,13 +813,21 @@ main {
   .timeline__card,
   .card,
   .logo,
-  .nav a::after {
+  .nav a::after,
+  .bg-stars {
     transition: none !important;
+    animation: none !important;
   }
   .btn:hover,
   .timeline__card:hover,
   .card:hover,
   .logo:hover {
     transform: none !important;
+  }
+
+  .site-signature {
+    position: static;
+    margin: 0.9rem auto 0;
+    width: fit-content;
   }
 }
